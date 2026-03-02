@@ -16,6 +16,7 @@ export async function GET(request: NextRequest) {
   const serialized: Contact[] = contacts.map((c) => ({
     ...c,
     lastInteraction: c.lastInteraction?.toISOString() ?? null,
+    birthday: c.birthday?.toISOString() ?? null,
     createdAt: c.createdAt.toISOString(),
     updatedAt: c.updatedAt.toISOString(),
     groups: c.groups.map((cg) => ({
