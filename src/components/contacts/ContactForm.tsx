@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { ContactSchema, type ContactFormValues } from "@/lib/validations";
@@ -16,6 +17,7 @@ interface ContactFormProps {
   groups: Group[];
   onSubmit: (data: ContactFormValues) => Promise<void>;
   onCancel: () => void;
+  onDirtyChange?: (isDirty: boolean) => void;
   isLoading?: boolean;
 }
 
@@ -24,6 +26,7 @@ export function ContactForm({
   groups,
   onSubmit,
   onCancel,
+  onDirtyChange,
   isLoading,
 }: ContactFormProps) {
   const {
@@ -31,7 +34,7 @@ export function ContactForm({
     handleSubmit,
     watch,
     setValue,
-    formState: { errors },
+    formState: { errors, isDirty },
   } = useForm<ContactFormValues>({
     resolver: zodResolver(ContactSchema),
     defaultValues: {
@@ -56,6 +59,10 @@ export function ContactForm({
 
   const warmth = watch("warmth");
   const groupIds = watch("groupIds");
+
+  useEffect(() => {
+    onDirtyChange?.(isDirty);
+  }, [isDirty, onDirtyChange]);
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">

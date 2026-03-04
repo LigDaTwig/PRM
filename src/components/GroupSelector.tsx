@@ -54,7 +54,7 @@ export function GroupSelector({ groups, selectedIds, onChange }: GroupSelectorPr
             }
           }}
           className={cn(
-            "flex min-h-9 w-full cursor-pointer flex-wrap items-center gap-1 rounded-md border border-[--input] bg-transparent px-3 py-1.5 text-sm shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[--ring]",
+            "flex min-h-9 w-full cursor-pointer flex-wrap items-center gap-1 rounded-md border border-white/70 bg-white/60 backdrop-blur-sm px-3 py-1.5 text-sm shadow-sm shadow-black/5 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[--ring]",
             selectedGroups.length === 0 && "text-[--muted-foreground]"
           )}
         >
