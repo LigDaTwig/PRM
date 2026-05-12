@@ -11,6 +11,7 @@ export const CSV_COLUMNS = [
   "warmth",
   "notes",
   "lastInteraction",
+  "birthday",
   "linkedinUrl",
   "groups",
 ] as const;
@@ -37,6 +38,7 @@ export function contactsToCSV(contacts: Contact[]): string {
     warmth: c.warmth,
     notes: c.notes ?? "",
     lastInteraction: c.lastInteraction ?? "",
+    birthday: c.birthday ?? "",
     linkedinUrl: c.linkedinUrl ?? "",
     groups: c.groups.map((g) => g.name).join("|"),
   }));

@@ -64,7 +64,7 @@ export function ImportDialog({ open, onClose, onImported }: ImportDialogProps) {
           <DialogTitle>Import Contacts</DialogTitle>
           <DialogDescription>
             Upload a CSV or Excel file (.csv, .xlsx, .xls). Columns:{" "}
-            <code className="text-xs">firstName, lastName, email, phone, workTitle, company, warmth, notes, lastInteraction, linkedinUrl, groups</code>
+            <code className="text-xs">firstName, lastName, email, phone, workTitle, company, warmth, notes, lastInteraction, birthday, linkedinUrl, groups</code>
             . Groups separated by <code>|</code>.
           </DialogDescription>
         </DialogHeader>

@@ -23,8 +23,8 @@ function formatContact(c: {
 }) {
   return {
     ...c,
-    lastInteraction: c.lastInteraction?.toISOString() ?? null,
-    birthday: c.birthday?.toISOString() ?? null,
+    lastInteraction: c.lastInteraction?.toISOString().slice(0, 10) ?? null,
+    birthday: c.birthday?.toISOString().slice(0, 10) ?? null,
     createdAt: c.createdAt.toISOString(),
     updatedAt: c.updatedAt.toISOString(),
     groups: c.groups.map((cg) => ({
