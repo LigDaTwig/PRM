@@ -5,10 +5,20 @@ import { CSV_COLUMNS } from "./csv";
 type SheetRow = Record<string, string | number>;
 
 export function parseExcel(buffer: ArrayBuffer): SheetRow[] {
-  const workbook = XLSX.read(buffer, { type: "array" });
+  // cellDates: true makes SheetJS return real JS Date objects for date cells
+  // instead of raw Excel serial numbers (e.g. 46045), which Date.parse() would
+  // misread as a year (year 46045).
+  const workbook = XLSX.read(buffer, { type: "array", cellDates: true });
   const sheetName = workbook.SheetNames[0];
   const sheet = workbook.Sheets[sheetName];
-  return XLSX.utils.sheet_to_json<SheetRow>(sheet, { defval: "" });
+  const rows = XLSX.utils.sheet_to_json<Record<string, unknown>>(sheet, { defval: "" });
+  return rows.map((row) => {
+    const out: SheetRow = {};
+    for (const [k, v] of Object.entries(row)) {
+      out[k] = v instanceof Date ? v.toISOString().slice(0, 10) : (v as string | number);
+    }
+    return out;
+  });
 }
 
 export function contactsToExcel(contacts: Contact[]): Uint8Array {
@@ -22,6 +32,7 @@ export function contactsToExcel(contacts: Contact[]): Uint8Array {
     warmth: c.warmth,
     notes: c.notes ?? "",
     lastInteraction: c.lastInteraction ?? "",
+    birthday: c.birthday ?? "",
     linkedinUrl: c.linkedinUrl ?? "",
     groups: c.groups.map((g) => g.name).join("|"),
   }));

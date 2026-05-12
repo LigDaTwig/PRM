@@ -48,8 +48,8 @@ export async function GET(request: NextRequest) {
 
   const result = contacts.map((c) => ({
     ...c,
-    lastInteraction: c.lastInteraction?.toISOString() ?? null,
-    birthday: c.birthday?.toISOString() ?? null,
+    lastInteraction: c.lastInteraction?.toISOString().slice(0, 10) ?? null,
+    birthday: c.birthday?.toISOString().slice(0, 10) ?? null,
     createdAt: c.createdAt.toISOString(),
     updatedAt: c.updatedAt.toISOString(),
     groups: c.groups.map((cg) => ({
@@ -99,8 +99,8 @@ export async function POST(request: NextRequest) {
   return NextResponse.json(
     {
       ...contact,
-      lastInteraction: contact.lastInteraction?.toISOString() ?? null,
-      birthday: contact.birthday?.toISOString() ?? null,
+      lastInteraction: contact.lastInteraction?.toISOString().slice(0, 10) ?? null,
+      birthday: contact.birthday?.toISOString().slice(0, 10) ?? null,
       createdAt: contact.createdAt.toISOString(),
       updatedAt: contact.updatedAt.toISOString(),
       groups: contact.groups.map((cg) => ({

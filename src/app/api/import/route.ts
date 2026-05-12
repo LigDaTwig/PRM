@@ -10,6 +10,17 @@ async function processRows(rows: ImportRow[]) {
   let skipped = 0;
   const errors: string[] = [];
 
+  // Pre-fetch existing contacts for duplicate detection
+  const existingContacts = await prisma.contact.findMany({
+    select: { email: true, firstName: true, lastName: true },
+  });
+  const existingEmails = new Set(
+    existingContacts.filter((c) => c.email).map((c) => c.email!.toLowerCase())
+  );
+  const existingNames = new Set(
+    existingContacts.map((c) => `${c.firstName.toLowerCase()}|${c.lastName.toLowerCase()}`)
+  );
+
   // Pre-fetch all groups to map by name
   const allGroups = await prisma.group.findMany();
   const groupByName = new Map(allGroups.map((g) => [g.name.toLowerCase(), g]));
@@ -28,6 +39,18 @@ async function processRows(rows: ImportRow[]) {
 
     if (!firstName || !lastName) {
       errors.push(`Row ${rowNum}: Missing first or last name`);
+      skipped++;
+      continue;
+    }
+
+    // Duplicate check — email takes priority; fall back to full name
+    const emailKey = String(row.email ?? "").trim().toLowerCase();
+    const nameKey = `${firstName.toLowerCase()}|${lastName.toLowerCase()}`;
+    if (emailKey && existingEmails.has(emailKey)) {
+      skipped++;
+      continue;
+    }
+    if (!emailKey && existingNames.has(nameKey)) {
       skipped++;
       continue;
     }
@@ -61,6 +84,12 @@ async function processRows(rows: ImportRow[]) {
           ? new Date(lastInteractionRaw)
           : null;
 
+      const birthdayRaw = String(row.birthday ?? "").trim();
+      const birthday =
+        birthdayRaw && !isNaN(Date.parse(birthdayRaw))
+          ? new Date(birthdayRaw)
+          : null;
+
       await prisma.contact.create({
         data: {
           firstName,
@@ -72,6 +101,7 @@ async function processRows(rows: ImportRow[]) {
           warmth,
           notes: String(row.notes ?? "").trim() || null,
           lastInteraction,
+          birthday,
           linkedinUrl: String(row.linkedinUrl ?? "").trim() || null,
           groups: {
             create: groupIds.map((groupId) => ({ groupId })),
@@ -79,6 +109,9 @@ async function processRows(rows: ImportRow[]) {
         },
       });
 
+      // Track newly imported contacts so later rows in the same file are deduped too
+      if (emailKey) existingEmails.add(emailKey);
+      else existingNames.add(nameKey);
       imported++;
     } catch (e) {
       errors.push(`Row ${rowNum}: ${e instanceof Error ? e.message : "Unknown error"}`);
